@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>采购决策报告</title>
+<style>
+  :root{
+    --ink:#1a2230; --sub:#5b6675; --line:#e3e8ef; --bg:#f5f7fa; --card:#ffffff;
+    --brand:#1f4e79; --brand-2:#2e75b6; --accent:#0e7c66;
+    --pass:#1a7f4b; --fail:#c0392b; --pending:#b8770b;
+    --pass-bg:#e7f5ec; --fail-bg:#fdecea; --pending-bg:#fdf3e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",Arial,sans-serif;
+    font-size:14px;line-height:1.7}
+  .page{max-width:1080px;margin:0 auto;padding:32px 28px 64px}
+  header.cover{background:linear-gradient(135deg,#1f4e79,#2e75b6);color:#fff;
+    border-radius:14px;padding:34px 38px;margin-bottom:22px}
+  header.cover h1{margin:0 0 8px;font-size:26px;letter-spacing:.5px}
+  header.cover .meta{opacity:.92;font-size:13px}
+  header.cover .tags{margin-top:14px}
+  header.cover .tags span{display:inline-block;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 14px;
+    margin:0 8px 6px 0;font-size:12.5px}
+  section.chapter{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:24px 28px;margin-bottom:18px}
+  h2{font-size:18px;margin:0 0 16px;padding-left:12px;border-left:4px solid var(--brand-2)}
+  h3{font-size:15px;margin:20px 0 8px;color:var(--brand)}
+  .headline{font-size:15.5px;background:var(--pass-bg);border:1px solid #bfe3cd;
+    border-radius:10px;padding:14px 18px;margin-bottom:16px}
+  .rec{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;
+    display:flex;gap:14px;align-items:flex-start}
+  .rec .pri{flex:0 0 44px;text-align:center;border-radius:8px;color:#fff;font-size:12px;
+    padding:4px 0;font-weight:bold}
+  .pri.高{background:#c0392b}.pri.中{background:#b8770b}.pri.低{background:#5b6675}
+  .rec .body p{margin:2px 0}.rec .basis{color:var(--sub);font-size:12.5px}
+  table{border-collapse:collapse;width:100%;margin:10px 0 6px;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eef3f8;font-weight:600;white-space:nowrap}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.best td{background:#f2f9f5;font-weight:600}
+  .note{color:var(--sub);font-size:12.5px;margin:4px 0 0}
+  .pill{display:inline-block;border-radius:12px;padding:2px 11px;font-size:12px;font-weight:600}
+  .pill.pass{background:var(--pass-bg);color:var(--pass)}
+  .pill.fail{background:var(--fail-bg);color:var(--fail)}
+  .pill.pending{background:var(--pending-bg);color:var(--pending)}
+  .gate{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);
+    border-radius:10px;padding:11px 15px;margin-bottom:8px}
+  .gate .label{flex:0 0 230px;font-weight:600}
+  .chart{width:100%;min-height:320px;margin:14px 0}
+  .chart.tall{min-height:380px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  ul.tight{margin:6px 0;padding-left:22px}
+  ul.tight li{margin-bottom:4px}
+  .empty{color:var(--sub);font-style:italic}
+  footer{color:var(--sub);font-size:12px;text-align:center;margin-top:24px}
+  .warnbox{background:var(--fail-bg);border:1px solid #f3c4be;border-radius:10px;
+    padding:12px 16px;margin-top:8px}
+  .warnbox li{margin-bottom:4px}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr}.gate .label{flex-basis:auto}}
+  @media print{
+    body{background:#fff;font-size:12px}
+    .page{max-width:none;padding:0}
+    section.chapter,header.cover{break-inside:avoid;border-color:#ccc}
+    .chart{min-height:260px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============================================================
+       报告数据注入点：
+       将 __REPORT_DATA__ 整体替换为一个合法的 JSON 对象（保留引号）。
+       各章节字段均可选；未提供的章节显示“本次分析未涉及”。
+       JSON 结构见同包 SKILL.md「HTML 报告数据结构」一节。
+  ============================================================= -->
+  <script id="report-data" type="application/json">__REPORT_DATA__</script>
+
+  <!-- ECharts（国内镜像；加载失败时所有图表自动降级为数据表格） -->
+  <script src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+
+  <script>
+  (function(){
+    "use strict";
+
+    var RAW = document.getElementById("report-data").textContent.trim();
+    var D;
+    try { D = JSON.parse(RAW); }
+    catch(e){
+      document.body.insertAdjacentHTML("afterbegin",
+        '<div style="max-width:1080px;margin:24px auto;padding:16px 20px;background:#fdecea;'
+        +'border:1px solid #f3c4be;border-radius:10px;color:#c0392b">报告数据不是合法 JSON：'
+        + String(e.message) + "。请检查注入内容（引号/逗号/换行转义）。</div>");
+      return;
+    }
+
+    var hasChartLib = (typeof window.echarts !== "undefined");
+
+    function esc(v){
+      if(v===null||v===undefined) return "";
+      return String(v).replace(/[&<>"']/g, function(m){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];
+      });
+    }
+    function isNum(v){ return typeof v === "number" && isFinite(v); }
+    function fmt(v, digits){
+      if(!isNum(v)) return esc(v);
+      var d = (digits===undefined? 2 : digits);
+      return v.toLocaleString("zh-CN",{minimumFractionDigits:d,maximumFractionDigits:d});
+    }
+    function pct(v, digits){
+      if(!isNum(v)) return esc(v);
+      return (v*100).toFixed(digits===undefined?1:digits) + "%";
+    }
+    /* 表头支持 "名称" 或 {label, type:'num'|'pct', digits:n} */
+    function cellSpec(c){
+      if(typeof c === "string") return {label:c};
+      return c;
+    }
+    function renderCell(spec, v){
+      if(spec.type === "num") return '<td class="num">' + fmt(v, spec.digits) + "</td>";
+      if(spec.type === "pct") return '<td class="num">' + pct(v, spec.digits) + "</td>";
+      return "<td>" + esc(v) + "</td>";
+    }
+    function table(el, def){
+      if(!def || !def.columns || !def.rows || !def.rows.length){
+        el.innerHTML = '<p class="empty">本次分析未涉及</p>'; return;
+      }
+      var h = "<table><thead><tr>";
+      def.columns.forEach(function(c){
+        var s = cellSpec(c);
+        h += "<th" + (s.type? ' class="num"':'') + ">" + esc(s.label) + "</th>";
+      });
+      h += "</tr></thead><tbody>";
+      def.rows.forEach(function(r, i){
+        h += '<tr' + (def.highlight_best && i===0 ? ' class="best"':'') + '>';
+        def.columns.forEach(function(c){
+          var s = cellSpec(c);
+          var k = (typeof c === "string") ? c : (c.key !== undefined ? c.key : c.label);
+          h += renderCell(s, r[k]);
+        });
+        h += "</tr>";
+      });
+      h += "</tbody></table>";
+      if(def.note) h += '<p class="note">' + esc(def.note) + "</p>";
+      el.innerHTML = h;
+    }
+    function list(el, arr, emptyText){
+      if(!arr || !arr.length){ el.innerHTML = '<p class="empty">'+(emptyText||"本次分析未涉及")+"</p>"; return; }
+      el.innerHTML = "<ul class='tight'>" + arr.map(function(x){
+        return "<li>" + (typeof x === "string"? esc(x) : esc(x.text||JSON.stringify(x))) + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    /* ---------- 封面 ---------- */
+    var cover = document.getElementById("cover");
+    var tags = "";
+    (D.tags||[]).forEach(function(t){ tags += "<span>"+esc(t)+"</span>"; });
+    cover.innerHTML =
+      "<h1>"+esc(D.title||"采购决策报告")+"</h1>"
+      + '<div class="meta">'+esc(D.subtitle||"")+"</div>"
+      + '<div class="meta">生成时间：'+esc(D.generated_at||"")
+      + (D.decision_type? "　|　决策类型："+esc(D.decision_type):"") + "</div>"
+      + (D.basis_note? '<div class="meta">口径声明：'+esc(D.basis_note)+"</div>":"")
+      + (tags? '<div class="tags">'+tags+"</div>":"");
+
+    /* ---------- 1 结论与建议 ---------- */
+    if(D.headline) document.getElementById("headline").textContent = D.headline;
+    else document.getElementById("headline").parentElement.style.display = "none";
+    var recEl = document.getElementById("recs");
+    if(D.recommendations && D.recommendations.length){
+      recEl.innerHTML = D.recommendations.map(function(r){
+        var p = esc(r.priority||"中");
+        return '<div class="rec"><div class="pri '+p+'">'+p+"</div><div class='body'>"
+          + "<p><strong>"+esc(r.text)+"</strong></p>"
+          + (r.basis? '<p class="basis">依据：'+esc(r.basis)+"</p>":"")
+          + "</div></div>";
+      }).join("");
+    } else recEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 2 归一化对比 ---------- */
+    table(document.getElementById("comparison-body"), D.comparison);
+
+    /* ---------- 3 成本/指标明细 ---------- */
+    var detailEl = document.getElementById("details");
+    if(D.details && D.details.length){
+      detailEl.innerHTML = D.details.map(function(g){
+        var h = g.title? "<h3>"+esc(g.title)+"</h3>":"";
+        var holderId = "dt-"+Math.random().toString(36).slice(2,9);
+        setTimeout(function(){ table(document.getElementById(holderId), g); },0);
+        return h + '<div id="'+holderId+'"></div>';
+      }).join("");
+    } else detailEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 4 情景与敏感性 ---------- */
+    if(D.scenario_intro) document.getElementById("scenario-intro").textContent = D.scenario_intro;
+    else document.getElementById("scenario-intro").style.display = "none";
+    table(document.getElementById("scenario-table"), D.scenario_table);
+
+    /* ---------- 5 风险与闸门 ---------- */
+    var gateEl = document.getElementById("gates");
+    if(D.gates && D.gates.length){
+      gateEl.innerHTML = D.gates.map(function(g){
+        var st = (g.status||"pending");
+        var label = {pass:"通过",fail:"未通过",pending:"待核实/待补证"}[st]||st;
+        return '<div class="gate"><div class="label">'+esc(g.item)+"</div>"
+          + '<div><span class="pill '+st+'">'+label+"</span></div>"
+          + '<div class="note">'+esc(g.implication||"")+"</div></div>";
+      }).join("");
+    } else gateEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 6 行动计划 ---------- */
+    table(document.getElementById("actions"), D.actions);
+
+    /* ---------- 7 数据口径与来源 ---------- */
+    list(document.getElementById("sources"), (D.data_basis||{}).sources);
+    list(document.getElementById("assumptions"), (D.data_basis||{}).assumptions);
+    list(document.getElementById("excluded"), (D.data_basis||{}).excluded);
+    var warnEl = document.getElementById("warnings");
+    var warns = (D.data_basis||{}).warnings || [];
+    if(warns.length){
+      warnEl.innerHTML = '<div class="warnbox"><ul class="tight">'
+        + warns.map(function(w){return "<li>"+esc(w)+"</li>";}).join("") + "</ul></div>";
+    } else warnEl.innerHTML = '<p class="empty">无</p>';
+
+    /* ---------- 图表区（按 chapters 挂载，支持多图） ---------- */
+    function fallbackTable(chart){
+      var c = chart.data||{};
+      var cols, rows;
+      if(chart.type === "pie"){
+        cols = ["名称",{label:"数值",type:"num",digits:chart.digits}];
+        rows = (c.data||[]).map(function(x){return {"名称":x.name,"数值":x.value};});
+      } else {
+        cols = [{label:c.xName||"类目"}].concat((c.series||[]).map(function(s){
+          return {label:s.name, type:"num", digits:chart.digits};
+        }));
+        rows = (c.xData||[]).map(function(x,i){
+          var row = {"类目":x};
+          (c.series||[]).forEach(function(s){ row[s.name] = s.data[i]; });
+          return row;
+        });
+        cols[0] = {label:c.xName||"类目", key:"类目"};
+      }
+      return {columns:cols, rows:rows};
+    }
+    function renderChart(chart){
+      var box = document.createElement("div");
+      if(chart.title) box.innerHTML = "<h3>"+esc(chart.title)+"</h3>";
+      var holder = document.createElement("div");
+      holder.className = "chart" + (chart.type==="bar"&&chart.tall? " tall":"");
+      box.appendChild(holder);
+      if(hasChartLib){
+        setTimeout(function(){
+          var inst = echarts.init(holder);
+          var opt;
+          if(chart.type === "pie"){
+            opt = {tooltip:{trigger:"item",valueFormatter:function(v){return fmt(v,chart.digits);}},
+              legend:{bottom:0,type:"scroll"},
+              series:[{type:"pie",radius:["38%","66%"],center:["50%","45%"],
+                data:(chart.data.data||[]),label:{formatter:"{b}: {d}%"}}]};
+          } else {
+            var series = (chart.data.series||[]).map(function(s){
+              return {name:s.name,type:chart.type,data:s.data,
+                smooth:true, label:{show:chart.type==="bar",position:"top",fontSize:11},
+                barMaxWidth:46};
+            });
+            opt = {tooltip:{trigger:"axis"},
+              legend:{bottom:0,type:"scroll"},
+              grid:{left:60,right:24,top:34,bottom:56,containLabel:true},
+              xAxis:{type:"category",data:chart.data.xData,name:chart.data.xName},
+              yAxis:{type:"value",name:chart.data.yName},
+              series:series};
+          }
+          inst.setOption(opt);
+          window.addEventListener("resize", function(){ inst.resize(); });
+        },0);
+      } else {
+        var t = document.createElement("div");
+        table(t, fallbackTable(chart));
+        box.appendChild(t);
+      }
+      return box;
+    }
+    function mountCharts(sectionId, charts){
+      var host = document.getElementById(sectionId+"-charts");
+      if(!host) return;
+      if(!charts || !charts.length){ host.innerHTML=""; return; }
+      if(charts.length === 1){ host.appendChild(renderChart(charts[0])); }
+      else {
+        var grid = document.createElement("div"); grid.className="grid2";
+        charts.forEach(function(c){ grid.appendChild(renderChart(c)); });
+        host.appendChild(grid);
+      }
+    }
+    mountCharts("comparison", D.comparison_charts);
+    mountCharts("scenario", D.scenario_charts);
+    if(D.detail_charts && D.detail_charts.length){
+      mountCharts("details", D.detail_charts);
+    }
+
+    document.getElementById("footer").textContent =
+      "本报告由「采购决策副驾」基于用户提供的数据计算生成；数字结果可复算，结论仅供决策参考，不替代法律、税务或报关专业意见。";
+  })();
+  </script>
+
+  <header class="cover" id="cover"></header>
+
+  <section class="chapter">
+    <h2>1 · 结论与建议</h2>
+    <div class="headline" id="headline"></div>
+    <div id="recs"></div>
+  </section>
+
+  <section class="chapter" id="comparison">
+    <h2>2 · 归一化对比</h2>
+    <div id="comparison-body"></div>
+    <div id="comparison-charts"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>3 · 成本与指标明细</h2>
+    <div id="details"></div>
+    <div id="details-charts"></div>
+  </section>
+
+  <section class="chapter" id="scenario">
+    <h2>4 · 情景与敏感性</h2>
+    <p id="scenario-intro"></p>
+    <div id="scenario-table"></div>
+    <div id="scenario-charts"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>5 · 风险与闸门</h2>
+    <div id="gates"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>6 · 行动计划</h2>
+    <div id="actions"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>7 · 数据口径与来源</h2>
+    <h3>数据来源</h3><div id="sources"></div>
+    <h3>关键假设</h3><div id="assumptions"></div>
+    <h3>剔除与未纳入项</h3><div id="excluded"></div>
+    <h3>计算告警</h3><div id="warnings"></div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+</body>
+</html>

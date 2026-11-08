@@ -1,0 +1,269 @@
+{
+  "mode": "score",
+  "weight_sum": 1.0,
+  "candidates": [
+    {
+      "supplier": "甲供应商（示例）",
+      "gates": [
+        {
+          "key": "iso9001",
+          "label": "ISO9001 认证在有效期内",
+          "status": "pass"
+        },
+        {
+          "key": "env_compliant",
+          "label": "近一年无重大环保/安全处罚",
+          "status": "pass"
+        },
+        {
+          "key": "rohs",
+          "label": "物料 RoHS 合规声明可提供",
+          "status": "pass"
+        }
+      ],
+      "metrics": {
+        "net_price": 13.27,
+        "pass_rate": 0.985,
+        "otd": 0.96,
+        "payment_days": 60
+      },
+      "rejected": false,
+      "pending": false,
+      "metric_details": [
+        {
+          "key": "net_price",
+          "label": "归一化净单价(元)",
+          "value": 13.27,
+          "status": "used",
+          "normalized": 0.0,
+          "weight_used": 0.3
+        },
+        {
+          "key": "pass_rate",
+          "label": "近6月批次合格率",
+          "value": 0.985,
+          "status": "used",
+          "normalized": 1.0,
+          "weight_used": 0.3
+        },
+        {
+          "key": "otd",
+          "label": "近6月 OTD 准时交付率",
+          "value": 0.96,
+          "status": "used",
+          "normalized": 1.0,
+          "weight_used": 0.25
+        },
+        {
+          "key": "payment_days",
+          "label": "账期(天)",
+          "value": 60.0,
+          "status": "used",
+          "normalized": 1.0,
+          "weight_used": 0.15
+        }
+      ],
+      "final_score": 0.7,
+      "rank": 1,
+      "result": "通过门槛，进入排名"
+    },
+    {
+      "supplier": "丁供应商（示例·待补证）",
+      "gates": [
+        {
+          "key": "iso9001",
+          "label": "ISO9001 认证在有效期内",
+          "status": "pass"
+        },
+        {
+          "key": "env_compliant",
+          "label": "近一年无重大环保/安全处罚",
+          "status": "pass"
+        },
+        {
+          "key": "rohs",
+          "label": "物料 RoHS 合规声明可提供",
+          "status": "pending"
+        }
+      ],
+      "metrics": {
+        "net_price": 13.2,
+        "pass_rate": 0.96,
+        "payment_days": 50
+      },
+      "rejected": false,
+      "pending": true,
+      "metric_details": [
+        {
+          "key": "net_price",
+          "label": "归一化净单价(元)",
+          "value": 13.2,
+          "status": "used",
+          "normalized": 0.1892,
+          "weight_used": 0.3
+        },
+        {
+          "key": "pass_rate",
+          "label": "近6月批次合格率",
+          "value": 0.96,
+          "status": "used",
+          "normalized": 0.4444,
+          "weight_used": 0.3
+        },
+        {
+          "key": "otd",
+          "label": "近6月 OTD 准时交付率",
+          "value": null,
+          "status": "missing",
+          "normalized": null,
+          "weight_used": 0.0
+        },
+        {
+          "key": "payment_days",
+          "label": "账期(天)",
+          "value": 50.0,
+          "status": "used",
+          "normalized": 0.6667,
+          "weight_used": 0.15
+        }
+      ],
+      "final_score": 0.3868,
+      "rank": 2,
+      "result": "待补证后复评（门槛待核实）"
+    },
+    {
+      "supplier": "乙供应商（示例）",
+      "gates": [
+        {
+          "key": "iso9001",
+          "label": "ISO9001 认证在有效期内",
+          "status": "pass"
+        },
+        {
+          "key": "env_compliant",
+          "label": "近一年无重大环保/安全处罚",
+          "status": "pass"
+        },
+        {
+          "key": "rohs",
+          "label": "物料 RoHS 合规声明可提供",
+          "status": "pass"
+        }
+      ],
+      "metrics": {
+        "net_price": 12.9,
+        "pass_rate": 0.94,
+        "otd": 0.88,
+        "payment_days": 30
+      },
+      "rejected": false,
+      "pending": false,
+      "metric_details": [
+        {
+          "key": "net_price",
+          "label": "归一化净单价(元)",
+          "value": 12.9,
+          "status": "used",
+          "normalized": 1.0,
+          "weight_used": 0.3
+        },
+        {
+          "key": "pass_rate",
+          "label": "近6月批次合格率",
+          "value": 0.94,
+          "status": "used",
+          "normalized": 0.0,
+          "weight_used": 0.3
+        },
+        {
+          "key": "otd",
+          "label": "近6月 OTD 准时交付率",
+          "value": 0.88,
+          "status": "used",
+          "normalized": 0.0,
+          "weight_used": 0.25
+        },
+        {
+          "key": "payment_days",
+          "label": "账期(天)",
+          "value": 30.0,
+          "status": "used",
+          "normalized": 0.0,
+          "weight_used": 0.15
+        }
+      ],
+      "final_score": 0.3,
+      "rank": 3,
+      "result": "通过门槛，进入排名"
+    },
+    {
+      "supplier": "丙供应商（示例）",
+      "gates": [
+        {
+          "key": "iso9001",
+          "label": "ISO9001 认证在有效期内",
+          "status": "pass"
+        },
+        {
+          "key": "env_compliant",
+          "label": "近一年无重大环保/安全处罚",
+          "status": "fail"
+        },
+        {
+          "key": "rohs",
+          "label": "物料 RoHS 合规声明可提供",
+          "status": "pass"
+        }
+      ],
+      "metrics": {
+        "net_price": 14.6,
+        "pass_rate": 0.97,
+        "otd": 0.95,
+        "payment_days": 45
+      },
+      "rejected": true,
+      "pending": false,
+      "metric_details": [
+        {
+          "key": "net_price",
+          "label": "归一化净单价(元)",
+          "value": 14.6,
+          "status": "used",
+          "normalized": -3.5946,
+          "weight_used": 0.3
+        },
+        {
+          "key": "pass_rate",
+          "label": "近6月批次合格率",
+          "value": 0.97,
+          "status": "used",
+          "normalized": 0.6667,
+          "weight_used": 0.3
+        },
+        {
+          "key": "otd",
+          "label": "近6月 OTD 准时交付率",
+          "value": 0.95,
+          "status": "used",
+          "normalized": 0.875,
+          "weight_used": 0.25
+        },
+        {
+          "key": "payment_days",
+          "label": "账期(天)",
+          "value": 45.0,
+          "status": "used",
+          "normalized": 0.5,
+          "weight_used": 0.15
+        }
+      ],
+      "final_score": null,
+      "rank": null,
+      "result": "门槛未通过，淘汰"
+    }
+  ],
+  "warnings": [
+    "丁供应商（示例·待补证）: 指标「近6月 OTD 准时交付率」缺失，该指标不计分（不当零分）",
+    "丁供应商（示例·待补证）: 仅 0.75/1 权重有效，评分代表性不足"
+  ]
+}

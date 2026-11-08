@@ -1,0 +1,36 @@
+{
+  "mode": "landed",
+  "trade_term": "FOB",
+  "fx_rate": 7.12,
+  "fx_date": "2026-10-05",
+  "customs_value_cny": 375580.0,
+  "customs_value_components": {
+    "货值": 356000.0,
+    "运费": 17800.0,
+    "保险": 1780.0
+  },
+  "duty_cny": 30046.4,
+  "consumption_tax_cny": 0.0,
+  "vat_cny": 52731.432,
+  "vat_deductible": true,
+  "vat_note": "可抵扣：不进成本，单列垫付资金",
+  "landed_total_cny": 408626.4,
+  "landed_unit_cny": 40.8626,
+  "quantity": 10000.0,
+  "breakdown": {
+    "货值": 356000.0,
+    "国际运费": 17800.0,
+    "保险费": 1780.0,
+    "出口地费用": 0.0,
+    "进口地港杂": 1800.0,
+    "报关费": 1200.0,
+    "关税": 30046.4,
+    "消费税": 0.0,
+    "增值税(计入成本部分)": 0.0,
+    "其他费用": 0.0
+  },
+  "effective_tax_burden_rate": 0.08,
+  "warnings": [
+    "关税/增值税/消费税与完税价格为按公开口径的情景测算，实际以海关认定与企业税务处理为准"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "mode": "price",
+  "total_qty": 97000.0,
+  "total_spend_cny": 1256550.0,
+  "wap_overall": 12.9541,
+  "periods": [
+    {
+      "period": "2026-04",
+      "qty": 15000.0,
+      "wap": 13.55,
+      "mom": null
+    },
+    {
+      "period": "2026-05",
+      "qty": 12000.0,
+      "wap": 13.4,
+      "mom": -0.0111
+    },
+    {
+      "period": "2026-06",
+      "qty": 8000.0,
+      "wap": 13.7,
+      "mom": 0.0224
+    },
+    {
+      "period": "2026-07",
+      "qty": 20000.0,
+      "wap": 12.65,
+      "mom": -0.0766
+    },
+    {
+      "period": "2026-08",
+      "qty": 20000.0,
+      "wap": 12.69,
+      "mom": 0.0032
+    },
+    {
+      "period": "2026-09",
+      "qty": 22000.0,
+      "wap": 12.55,
+      "mom": -0.011
+    }
+  ],
+  "change_first_to_last": -0.0738,
+  "cv_by_period": 0.0359,
+  "ppv_vs_baseline_cny": -62650.0,
+  "supplier_mix": [
+    {
+      "supplier": "乙供应商（示例）",
+      "spend": 755000.0,
+      "share": 0.6009
+    },
+    {
+      "supplier": "甲供应商（示例）",
+      "spend": 404400.0,
+      "share": 0.3218
+    },
+    {
+      "supplier": "丙供应商（示例）",
+      "spend": 97150.0,
+      "share": 0.0773
+    }
+  ],
+  "warnings": []
+}

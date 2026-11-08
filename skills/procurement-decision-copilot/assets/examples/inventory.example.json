@@ -1,0 +1,20 @@
+{
+  "_说明": "库存补货示例，物料与数据均为虚构。数量单位：只；时间单位：天。",
+  "item": "工业连接器 X20（示例物料）",
+  "warehouse": "一号仓",
+  "snapshot_date": "2026-10-05",
+  "on_hand": 8200,
+  "blocked": 300,
+  "allocated": 900,
+  "in_transit": 4000,
+  "backorders": 0,
+  "committed": 1500,
+  "avg_daily_demand": 330,
+  "demand_std_daily": 70,
+  "lead_time_days": 14,
+  "lead_time_std_days": 3,
+  "service_z": 1.65,
+  "review_period_days": 0,
+  "moq": 5000,
+  "order_multiple": 500
+}

@@ -1,0 +1,15 @@
+{
+  "mode": "inventory",
+  "usable_stock": 7000.0,
+  "inventory_position": 9500.0,
+  "lead_time_demand": 4620.0,
+  "safety_stock": 1689.6999,
+  "service_z": 1.65,
+  "rop": 6309.6999,
+  "target_position": 6309.6999,
+  "order_qty_raw": 0,
+  "order_qty_constrained": 0.0,
+  "days_of_supply": 28.7879,
+  "alerts": [],
+  "warnings": []
+}

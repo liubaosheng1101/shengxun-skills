@@ -1,0 +1,86 @@
+{
+  "_说明": "采购订单价格趋势示例，公司与数据均为虚构。单价均为不含税口径（13%专票可抵扣）。",
+  "baseline_price": 13.6,
+  "orders": [
+    {
+      "period": "2026-04",
+      "supplier": "甲供应商（示例）",
+      "qty": 10000,
+      "unit_price": 13.4,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-04",
+      "supplier": "丙供应商（示例）",
+      "qty": 5000,
+      "unit_price": 13.85,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-05",
+      "supplier": "甲供应商（示例）",
+      "qty": 12000,
+      "unit_price": 13.4,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-06",
+      "supplier": "甲供应商（示例）",
+      "qty": 8000,
+      "unit_price": 13.7,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-07",
+      "supplier": "乙供应商（示例）",
+      "qty": 20000,
+      "unit_price": 12.65,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-08",
+      "supplier": "乙供应商（示例）",
+      "qty": 18000,
+      "unit_price": 12.55,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-08",
+      "supplier": "丙供应商（示例）",
+      "qty": 2000,
+      "unit_price": 13.95,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    },
+    {
+      "period": "2026-09",
+      "supplier": "乙供应商（示例）",
+      "qty": 22000,
+      "unit_price": 12.55,
+      "price_tax": "excluded",
+      "tax_rate": 0.13,
+      "deductible": true,
+      "status": "normal"
+    }
+  ]
+}

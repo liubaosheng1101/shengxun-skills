@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>采购决策报告</title>
+<style>
+  :root{
+    --ink:#1a2230; --sub:#5b6675; --line:#e3e8ef; --bg:#f5f7fa; --card:#ffffff;
+    --brand:#1f4e79; --brand-2:#2e75b6; --accent:#0e7c66;
+    --pass:#1a7f4b; --fail:#c0392b; --pending:#b8770b;
+    --pass-bg:#e7f5ec; --fail-bg:#fdecea; --pending-bg:#fdf3e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",Arial,sans-serif;
+    font-size:14px;line-height:1.7}
+  .page{max-width:1080px;margin:0 auto;padding:32px 28px 64px}
+  header.cover{background:linear-gradient(135deg,#1f4e79,#2e75b6);color:#fff;
+    border-radius:14px;padding:34px 38px;margin-bottom:22px}
+  header.cover h1{margin:0 0 8px;font-size:26px;letter-spacing:.5px}
+  header.cover .meta{opacity:.92;font-size:13px}
+  header.cover .tags{margin-top:14px}
+  header.cover .tags span{display:inline-block;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 14px;
+    margin:0 8px 6px 0;font-size:12.5px}
+  section.chapter{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:24px 28px;margin-bottom:18px}
+  h2{font-size:18px;margin:0 0 16px;padding-left:12px;border-left:4px solid var(--brand-2)}
+  h3{font-size:15px;margin:20px 0 8px;color:var(--brand)}
+  .headline{font-size:15.5px;background:var(--pass-bg);border:1px solid #bfe3cd;
+    border-radius:10px;padding:14px 18px;margin-bottom:16px}
+  .rec{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;
+    display:flex;gap:14px;align-items:flex-start}
+  .rec .pri{flex:0 0 44px;text-align:center;border-radius:8px;color:#fff;font-size:12px;
+    padding:4px 0;font-weight:bold}
+  .pri.高{background:#c0392b}.pri.中{background:#b8770b}.pri.低{background:#5b6675}
+  .rec .body p{margin:2px 0}.rec .basis{color:var(--sub);font-size:12.5px}
+  table{border-collapse:collapse;width:100%;margin:10px 0 6px;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eef3f8;font-weight:600;white-space:nowrap}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.best td{background:#f2f9f5;font-weight:600}
+  .note{color:var(--sub);font-size:12.5px;margin:4px 0 0}
+  .pill{display:inline-block;border-radius:12px;padding:2px 11px;font-size:12px;font-weight:600}
+  .pill.pass{background:var(--pass-bg);color:var(--pass)}
+  .pill.fail{background:var(--fail-bg);color:var(--fail)}
+  .pill.pending{background:var(--pending-bg);color:var(--pending)}
+  .gate{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);
+    border-radius:10px;padding:11px 15px;margin-bottom:8px}
+  .gate .label{flex:0 0 230px;font-weight:600}
+  .chart{width:100%;min-height:320px;margin:14px 0}
+  .chart.tall{min-height:380px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  ul.tight{margin:6px 0;padding-left:22px}
+  ul.tight li{margin-bottom:4px}
+  .empty{color:var(--sub);font-style:italic}
+  footer{color:var(--sub);font-size:12px;text-align:center;margin-top:24px}
+  .warnbox{background:var(--fail-bg);border:1px solid #f3c4be;border-radius:10px;
+    padding:12px 16px;margin-top:8px}
+  .warnbox li{margin-bottom:4px}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr}.gate .label{flex-basis:auto}}
+  @media print{
+    body{background:#fff;font-size:12px}
+    .page{max-width:none;padding:0}
+    section.chapter,header.cover{break-inside:avoid;border-color:#ccc}
+    .chart{min-height:260px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============================================================
+       报告数据注入点：
+       将下方 <script id="report-data"> 标签内的 JSON 整体替换为一个合法的 JSON 对象（保留引号）。
+       各章节字段均可选；未提供的章节显示“本次分析未涉及”。
+       JSON 结构见同包 SKILL.md「HTML 报告数据结构」一节。
+  ============================================================= -->
+  <script id="report-data" type="application/json">{"title": "工业连接器 X20 报价归一化对比与授标建议（示例报告）", "subtitle": "三家供应商 · 年需求 120,000 只 · 数据均为虚构演示", "generated_at": "2026-10-05 15:30", "decision_type": "寻源授标 / 报价对比", "basis_note": "人民币计价；一般纳税人、进项可抵扣净价口径；年度 TCO = 净价货值 + 批次物流费 + 年服务费 + 一次性费用 − 返利；资金成本 6%/年；账期成本单列不并入排名。", "tags": ["寻源授标", "年度 TCO", "双源策略", "示例数据"], "headline": "乙供应商年度 TCO 最低（1,554,200 元），较现供应商近 6 月加权净价基线年节约 77,800 元（4.77%）；但其近 6 月 OTD 仅 88%、提前期 35 天，建议采用「乙供应商主供 70% + 甲供应商辅供 30%」双源授标，而非全额切换。", "recommendations": [{"priority": "高", "text": "按 70/30 份额授标：乙供应商 84,000 只/年、甲供应商 36,000 只/年，预期年采购成本约 1,570,016 元，较基线节约约 61,984 元。", "basis": "乙供应商年度 TCO 1,554,200 元最低；甲供应商 1,606,920 元次之，且提前期 25 天、OTD 96%，可作交付保障。"}, {"priority": "高", "text": "授标前补两项先决条件：乙供应商 X20 等效性书面确认（含关键尺寸/耐温/插拔寿命）+ 月产能不低于 10,000 只的现场或证据验证。", "basis": "参考方法论文件 04 授标闸门：未完成等效性与产能验证不得整额授标。"}, {"priority": "中", "text": "合同中锁定 12 个月价格有效期与涨价提前 60 天书面通知条款；乙供应商 30 天账期可作为谈判项，争取 60 天与甲供应商对齐。", "basis": "账期差 30 天对应的资金占用差约 8,077 元/年，金额有限但影响现金流统一管理。"}, {"priority": "低", "text": "丙供应商（小规模 3% 不可抵扣）归一化后净价 14.60 元，不纳入本轮授标，可保留为紧急小批量备选（MOQ 2,000、提前期 15 天）。", "basis": "不可抵扣进项导致单位获取成本 14.66 元，为三家中最高。"}], "comparison": {"columns": [{"label": "供应商"}, {"label": "含税口径"}, {"label": "归一化净单价(元)", "key": "净单价", "type": "num", "digits": 4}, {"label": "单位获取成本(元)", "key": "单位获取", "type": "num", "digits": 4}, {"label": "年度TCO(元)", "key": "年度TCO", "type": "num", "digits": 0}, {"label": "账期(天)", "key": "账期", "type": "num", "digits": 0}, {"label": "提前期(天)", "key": "提前期", "type": "num", "digits": 0}, {"label": "排名", "key": "排名", "type": "num", "digits": 0}], "rows": [{"供应商": "乙供应商（示例）", "含税口径": "未税13%专票", "净单价": 12.9, "单位获取": 12.9267, "年度TCO": 1554200, "账期": 30, "提前期": 35, "排名": 1}, {"供应商": "甲供应商（示例）", "含税口径": "含税13%专票转净额", "净单价": 13.2743, "单位获取": 13.5993, "年度TCO": 1606920, "账期": 60, "提前期": 25, "排名": 2}, {"供应商": "丙供应商（示例·小规模3%）", "含税口径": "含税3%不可抵全额", "净单价": 14.6, "单位获取": 14.66, "年度TCO": 1759200, "账期": 45, "提前期": 15, "排名": 3}], "highlight_best": true, "note": "单位获取成本含该报价批次物流费、一次性费用与年度服务费/返利的单位摊销；年度 TCO 按年需求 120,000 只与各方案批次数量推算批次数。"}, "comparison_charts": [{"type": "bar", "title": "年度 TCO 对比（元/年）", "digits": 0, "data": {"xName": "供应商", "yName": "元/年", "xData": ["乙供应商", "甲供应商", "丙供应商"], "series": [{"name": "年度TCO", "data": [1554200, 1606920, 1759200]}]}}, {"type": "bar", "title": "归一化净单价对比（元/只）", "digits": 2, "data": {"xName": "供应商", "yName": "元/只", "xData": ["乙供应商", "甲供应商", "丙供应商"], "series": [{"name": "净单价", "data": [12.9, 13.27, 14.6]}, {"name": "单位获取成本", "data": [12.93, 13.6, 14.66]}]}}], "details": [{"title": "乙供应商·年度成本拆解（元）", "columns": [{"label": "成本项"}, {"label": "金额(元)", "key": "金额", "type": "num", "digits": 0}, {"label": "说明"}], "rows": [{"成本项": "净价货值", "金额": 1548000, "说明": "12.90 x 120,000"}, {"成本项": "批次物流费", "金额": 7200, "说明": "1,800 x 4 批（30,000/批）"}, {"成本项": "年度服务费", "金额": 2000, "说明": ""}, {"成本项": "年度返利", "金额": -3000, "说明": "年返，已在报价条款中约定"}, {"成本项": "年度TCO合计", "金额": 1554200, "说明": "排名第 1"}]}, {"title": "账期资金占用（6%/年，仅现金视角，不并入 TCO 排名）", "columns": [{"label": "供应商"}, {"label": "账期(天)", "key": "账期", "type": "num", "digits": 0}, {"label": "年度资金成本(元)", "key": "成本", "type": "num", "digits": 0}], "rows": [{"供应商": "乙供应商", "账期": 30, "成本": 7634}, {"供应商": "甲供应商", "账期": 60, "成本": 15711}, {"供应商": "丙供应商", "账期": 45, "成本": 12960}]}], "scenario_intro": "份额情景按各方案年度 TCO 线性组合估算；涨价情景仅对净价货值部分施加涨幅，物流与固定费用不变。", "scenario_table": {"columns": [{"label": "情景"}, {"label": "年度成本(元)", "key": "成本", "type": "num", "digits": 0}, {"label": "较基线节约(元)", "key": "节约", "type": "num", "digits": 0}, {"label": "较基线幅度", "key": "幅度", "type": "pct", "digits": 2}, {"label": "交付风险"}], "rows": [{"情景": "100% 乙供应商", "成本": 1554200, "节约": 77800, "幅度": 0.0477, "交付风险": "高：单一来源，OTD 88%，提前期 35 天"}, {"情景": "乙供应商70% + 甲供应商30%（建议）", "成本": 1570016, "节约": 61984, "幅度": 0.038, "交付风险": "中低：甲供应商 OTD 96% 可兜底"}, {"情景": "100% 甲供应商", "成本": 1606920, "节约": 25080, "幅度": 0.0154, "交付风险": "低：OTD 96%、提前期 25 天"}, {"情景": "100% 乙供应商 + 年中涨价 3%", "成本": 1600640, "节约": 31360, "幅度": 0.0192, "交付风险": "高：价格与供应双风险叠加"}], "note": "基线 = 现供应商近 6 月加权净价 13.60 元/只 x 120,000 = 1,632,000 元/年。"}, "scenario_charts": [{"type": "bar", "title": "份额情景年度成本（元/年）", "digits": 0, "data": {"xName": "情景", "yName": "元/年", "xData": ["100%乙供应商", "70/30双源", "100%甲供应商", "涨价3%"], "series": [{"name": "年度成本", "data": [1554200, 1570016, 1606920, 1600640]}]}}], "gates": [{"item": "物料等效性（X20 三家是否可互换）", "status": "pending", "implication": "乙供应商为新供应商，需关键尺寸/材料/寿命测试比对，通过前不得替代现料号上线。"}, {"item": "乙供应商月产能验证（不少于 10,000 只）", "status": "pending", "implication": "承诺产能与已验证产能需分开看，必要时安排现场审核或要求排产证据。"}, {"item": "乙供应商 OTD 88% 的根因与改善承诺", "status": "pending", "implication": "要求提供近 6 月延迟明细与 CAPA 计划，写入供应协议考核条款。"}, {"item": "报价有效期与税务发票", "status": "pass", "implication": "三家报价均在 2026 年内有效期；发票类型已确认（13% 专票 x2、3% 普票 x1）。"}, {"item": "丙供应商环保/安全合规", "status": "fail", "implication": "评分阶段已因近一年安全处罚记录淘汰，本轮仅保留紧急备选资格，复评前不得下单。"}], "actions": {"columns": [{"label": "#", "key": "序号", "type": "num", "digits": 0}, {"label": "行动事项"}, {"label": "负责人", "key": "负责人"}, {"label": "期限", "key": "期限"}, {"label": "触发/复核条件", "key": "条件"}], "rows": [{"序号": 1, "行动事项": "向乙供应商、甲供应商发出 70/30 份额授标意向书，附价格与账期锁定条款", "负责人": "采购经理", "期限": "2026-10-10", "条件": "等效性与产能验证通过后转正"}, {"序号": 2, "行动事项": "安排乙供应商 X20 样品全尺寸/寿命测试（30 只样）", "负责人": "质量 SQE", "期限": "2026-10-20", "条件": "样品不合格则转 100% 甲供应商方案"}, {"序号": 3, "行动事项": "乙供应商产能与 OTD 现场/线上审核", "负责人": "SQE+计划", "期限": "2026-10-25", "条件": "验证产能低于 10,000 只/月则份额下调至 50%"}, {"序号": 4, "行动事项": "合同写入 OTD 不低于 95%、PPM 不高于 500 的考核与退出条款", "负责人": "采购+法务", "期限": "2026-11-05", "条件": "连续 2 月不达标启动份额转移"}, {"序号": 5, "行动事项": "建立甲供应商安全库存 1,650 只（约 5 天用量）作为切换缓冲", "负责人": "计划员", "期限": "首批订单时", "条件": "乙供应商首批到货验收合格后重估"}]}, "data_basis": {"sources": ["三家供应商 2026-10 报价单（虚构示例：甲 Q2026-001、乙 Q2026-007、丙口头报价整理）", "现供应商 2026 年 4-9 月采购订单数量加权净价 13.60 元/只（虚构基线）", "供应商绩效卡：乙 OTD 88%、合格率 94%；甲 OTD 96%、合格率 98.5%（虚构）"], "assumptions": ["年需求 120,000 只在未来 12 个月稳定，无重大项目波动", "资金年化成本 6%，仅用于账期现金视角参考", "各方案物流报价在合同期内不变；乙年返 3,000 元按可达成计入", "三家 X20 在评分阶段暂按等效料处理，等效性仍列为先决条件"], "excluded": ["质量失败成本（PPM 对应的返工/索赔）未货币化，仅以合格率与闸门形式呈现", "切换初期的加急运费、验厂费用未计入（缺乏报价依据）"], "warnings": ["报价含税/抵扣口径不一致，已按可抵扣净额归一，授标前须再次确认各家实际发票类型", "贸易术语不一致（EXW 上海 / EXW 苏州 / 送货到厂东莞），费用边界不同，已分别计入各家自报物流费", "本报告公司、报价与绩效数据均为虚构演示，不代表任何真实企业"]}}</script>
+
+  <!-- ECharts（国内镜像；加载失败时所有图表自动降级为数据表格） -->
+  <script src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+
+  <script>
+  (function(){
+    "use strict";
+
+    var RAW = document.getElementById("report-data").textContent.trim();
+    var D;
+    try { D = JSON.parse(RAW); }
+    catch(e){
+      document.body.insertAdjacentHTML("afterbegin",
+        '<div style="max-width:1080px;margin:24px auto;padding:16px 20px;background:#fdecea;'
+        +'border:1px solid #f3c4be;border-radius:10px;color:#c0392b">报告数据不是合法 JSON：'
+        + String(e.message) + "。请检查注入内容（引号/逗号/换行转义）。</div>");
+      return;
+    }
+
+    var hasChartLib = (typeof window.echarts !== "undefined");
+
+    function esc(v){
+      if(v===null||v===undefined) return "";
+      return String(v).replace(/[&<>"']/g, function(m){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];
+      });
+    }
+    function isNum(v){ return typeof v === "number" && isFinite(v); }
+    function fmt(v, digits){
+      if(!isNum(v)) return esc(v);
+      var d = (digits===undefined? 2 : digits);
+      return v.toLocaleString("zh-CN",{minimumFractionDigits:d,maximumFractionDigits:d});
+    }
+    function pct(v, digits){
+      if(!isNum(v)) return esc(v);
+      return (v*100).toFixed(digits===undefined?1:digits) + "%";
+    }
+    /* 表头支持 "名称" 或 {label, type:'num'|'pct', digits:n} */
+    function cellSpec(c){
+      if(typeof c === "string") return {label:c};
+      return c;
+    }
+    function renderCell(spec, v){
+      if(spec.type === "num") return '<td class="num">' + fmt(v, spec.digits) + "</td>";
+      if(spec.type === "pct") return '<td class="num">' + pct(v, spec.digits) + "</td>";
+      return "<td>" + esc(v) + "</td>";
+    }
+    function table(el, def){
+      if(!def || !def.columns || !def.rows || !def.rows.length){
+        el.innerHTML = '<p class="empty">本次分析未涉及</p>'; return;
+      }
+      var h = "<table><thead><tr>";
+      def.columns.forEach(function(c){
+        var s = cellSpec(c);
+        h += "<th" + (s.type? ' class="num"':'') + ">" + esc(s.label) + "</th>";
+      });
+      h += "</tr></thead><tbody>";
+      def.rows.forEach(function(r, i){
+        h += '<tr' + (def.highlight_best && i===0 ? ' class="best"':'') + '>';
+        def.columns.forEach(function(c){
+          var s = cellSpec(c);
+          var k = (typeof c === "string") ? c : (c.key !== undefined ? c.key : c.label);
+          h += renderCell(s, r[k]);
+        });
+        h += "</tr>";
+      });
+      h += "</tbody></table>";
+      if(def.note) h += '<p class="note">' + esc(def.note) + "</p>";
+      el.innerHTML = h;
+    }
+    function list(el, arr, emptyText){
+      if(!arr || !arr.length){ el.innerHTML = '<p class="empty">'+(emptyText||"本次分析未涉及")+"</p>"; return; }
+      el.innerHTML = "<ul class='tight'>" + arr.map(function(x){
+        return "<li>" + (typeof x === "string"? esc(x) : esc(x.text||JSON.stringify(x))) + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    /* ---------- 封面 ---------- */
+    var cover = document.getElementById("cover");
+    var tags = "";
+    (D.tags||[]).forEach(function(t){ tags += "<span>"+esc(t)+"</span>"; });
+    cover.innerHTML =
+      "<h1>"+esc(D.title||"采购决策报告")+"</h1>"
+      + '<div class="meta">'+esc(D.subtitle||"")+"</div>"
+      + '<div class="meta">生成时间：'+esc(D.generated_at||"")
+      + (D.decision_type? "　|　决策类型："+esc(D.decision_type):"") + "</div>"
+      + (D.basis_note? '<div class="meta">口径声明：'+esc(D.basis_note)+"</div>":"")
+      + (tags? '<div class="tags">'+tags+"</div>":"");
+
+    /* ---------- 1 结论与建议 ---------- */
+    if(D.headline) document.getElementById("headline").textContent = D.headline;
+    else document.getElementById("headline").parentElement.style.display = "none";
+    var recEl = document.getElementById("recs");
+    if(D.recommendations && D.recommendations.length){
+      recEl.innerHTML = D.recommendations.map(function(r){
+        var p = esc(r.priority||"中");
+        return '<div class="rec"><div class="pri '+p+'">'+p+"</div><div class='body'>"
+          + "<p><strong>"+esc(r.text)+"</strong></p>"
+          + (r.basis? '<p class="basis">依据：'+esc(r.basis)+"</p>":"")
+          + "</div></div>";
+      }).join("");
+    } else recEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 2 归一化对比 ---------- */
+    table(document.getElementById("comparison-body"), D.comparison);
+
+    /* ---------- 3 成本/指标明细 ---------- */
+    var detailEl = document.getElementById("details");
+    if(D.details && D.details.length){
+      detailEl.innerHTML = D.details.map(function(g){
+        var h = g.title? "<h3>"+esc(g.title)+"</h3>":"";
+        var holderId = "dt-"+Math.random().toString(36).slice(2,9);
+        setTimeout(function(){ table(document.getElementById(holderId), g); },0);
+        return h + '<div id="'+holderId+'"></div>';
+      }).join("");
+    } else detailEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 4 情景与敏感性 ---------- */
+    if(D.scenario_intro) document.getElementById("scenario-intro").textContent = D.scenario_intro;
+    else document.getElementById("scenario-intro").style.display = "none";
+    table(document.getElementById("scenario-table"), D.scenario_table);
+
+    /* ---------- 5 风险与闸门 ---------- */
+    var gateEl = document.getElementById("gates");
+    if(D.gates && D.gates.length){
+      gateEl.innerHTML = D.gates.map(function(g){
+        var st = (g.status||"pending");
+        var label = {pass:"通过",fail:"未通过",pending:"待核实/待补证"}[st]||st;
+        return '<div class="gate"><div class="label">'+esc(g.item)+"</div>"
+          + '<div><span class="pill '+st+'">'+label+"</span></div>"
+          + '<div class="note">'+esc(g.implication||"")+"</div></div>";
+      }).join("");
+    } else gateEl.innerHTML = '<p class="empty">本次分析未涉及</p>';
+
+    /* ---------- 6 行动计划 ---------- */
+    table(document.getElementById("actions"), D.actions);
+
+    /* ---------- 7 数据口径与来源 ---------- */
+    list(document.getElementById("sources"), (D.data_basis||{}).sources);
+    list(document.getElementById("assumptions"), (D.data_basis||{}).assumptions);
+    list(document.getElementById("excluded"), (D.data_basis||{}).excluded);
+    var warnEl = document.getElementById("warnings");
+    var warns = (D.data_basis||{}).warnings || [];
+    if(warns.length){
+      warnEl.innerHTML = '<div class="warnbox"><ul class="tight">'
+        + warns.map(function(w){return "<li>"+esc(w)+"</li>";}).join("") + "</ul></div>";
+    } else warnEl.innerHTML = '<p class="empty">无</p>';
+
+    /* ---------- 图表区（按 chapters 挂载，支持多图） ---------- */
+    function fallbackTable(chart){
+      var c = chart.data||{};
+      var cols, rows;
+      if(chart.type === "pie"){
+        cols = ["名称",{label:"数值",type:"num",digits:chart.digits}];
+        rows = (c.data||[]).map(function(x){return {"名称":x.name,"数值":x.value};});
+      } else {
+        cols = [{label:c.xName||"类目"}].concat((c.series||[]).map(function(s){
+          return {label:s.name, type:"num", digits:chart.digits};
+        }));
+        rows = (c.xData||[]).map(function(x,i){
+          var row = {"类目":x};
+          (c.series||[]).forEach(function(s){ row[s.name] = s.data[i]; });
+          return row;
+        });
+        cols[0] = {label:c.xName||"类目", key:"类目"};
+      }
+      return {columns:cols, rows:rows};
+    }
+    function renderChart(chart){
+      var box = document.createElement("div");
+      if(chart.title) box.innerHTML = "<h3>"+esc(chart.title)+"</h3>";
+      var holder = document.createElement("div");
+      holder.className = "chart" + (chart.type==="bar"&&chart.tall? " tall":"");
+      box.appendChild(holder);
+      if(hasChartLib){
+        setTimeout(function(){
+          var inst = echarts.init(holder);
+          var opt;
+          if(chart.type === "pie"){
+            opt = {tooltip:{trigger:"item",valueFormatter:function(v){return fmt(v,chart.digits);}},
+              legend:{bottom:0,type:"scroll"},
+              series:[{type:"pie",radius:["38%","66%"],center:["50%","45%"],
+                data:(chart.data.data||[]),label:{formatter:"{b}: {d}%"}}]};
+          } else {
+            var series = (chart.data.series||[]).map(function(s){
+              return {name:s.name,type:chart.type,data:s.data,
+                smooth:true, label:{show:chart.type==="bar",position:"top",fontSize:11},
+                barMaxWidth:46};
+            });
+            opt = {tooltip:{trigger:"axis"},
+              legend:{bottom:0,type:"scroll"},
+              grid:{left:60,right:24,top:34,bottom:56,containLabel:true},
+              xAxis:{type:"category",data:chart.data.xData,name:chart.data.xName},
+              yAxis:{type:"value",name:chart.data.yName},
+              series:series};
+          }
+          inst.setOption(opt);
+          window.addEventListener("resize", function(){ inst.resize(); });
+        },0);
+      } else {
+        var t = document.createElement("div");
+        table(t, fallbackTable(chart));
+        box.appendChild(t);
+      }
+      return box;
+    }
+    function mountCharts(sectionId, charts){
+      var host = document.getElementById(sectionId+"-charts");
+      if(!host) return;
+      if(!charts || !charts.length){ host.innerHTML=""; return; }
+      if(charts.length === 1){ host.appendChild(renderChart(charts[0])); }
+      else {
+        var grid = document.createElement("div"); grid.className="grid2";
+        charts.forEach(function(c){ grid.appendChild(renderChart(c)); });
+        host.appendChild(grid);
+      }
+    }
+    mountCharts("comparison", D.comparison_charts);
+    mountCharts("scenario", D.scenario_charts);
+    if(D.detail_charts && D.detail_charts.length){
+      mountCharts("details", D.detail_charts);
+    }
+
+    document.getElementById("footer").textContent =
+      "本报告由「采购决策副驾」基于用户提供的数据计算生成；数字结果可复算，结论仅供决策参考，不替代法律、税务或报关专业意见。";
+  })();
+  </script>
+
+  <header class="cover" id="cover"></header>
+
+  <section class="chapter">
+    <h2>1 · 结论与建议</h2>
+    <div class="headline" id="headline"></div>
+    <div id="recs"></div>
+  </section>
+
+  <section class="chapter" id="comparison">
+    <h2>2 · 归一化对比</h2>
+    <div id="comparison-body"></div>
+    <div id="comparison-charts"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>3 · 成本与指标明细</h2>
+    <div id="details"></div>
+    <div id="details-charts"></div>
+  </section>
+
+  <section class="chapter" id="scenario">
+    <h2>4 · 情景与敏感性</h2>
+    <p id="scenario-intro"></p>
+    <div id="scenario-table"></div>
+    <div id="scenario-charts"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>5 · 风险与闸门</h2>
+    <div id="gates"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>6 · 行动计划</h2>
+    <div id="actions"></div>
+  </section>
+
+  <section class="chapter">
+    <h2>7 · 数据口径与来源</h2>
+    <h3>数据来源</h3><div id="sources"></div>
+    <h3>关键假设</h3><div id="assumptions"></div>
+    <h3>剔除与未纳入项</h3><div id="excluded"></div>
+    <h3>计算告警</h3><div id="warnings"></div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "_说明": "进口 landed cost 示例，数据均为虚构。货值/运费/保险/出口地费用为外币(USD)，进口地费用为人民币；税率仅为情景假设，须以 HS 归类与海关认定为准。",
+  "trade_term": "FOB",
+  "currency": "USD",
+  "fx_rate": 7.12,
+  "fx_date": "2026-10-05",
+  "goods_value": 50000,
+  "freight": 2500,
+  "insurance": 250,
+  "origin_charges": 0,
+  "destination_charges": 1800,
+  "brokerage": 1200,
+  "duty_rate": 0.08,
+  "vat_rate": 0.13,
+  "vat_deductible": true,
+  "consumption_tax_rate": 0,
+  "other_taxes": 0,
+  "quantity": 10000
+}

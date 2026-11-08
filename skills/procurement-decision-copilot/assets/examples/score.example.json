@@ -1,0 +1,100 @@
+{
+  "_说明": "供应商评分示例，公司与数据均为虚构。gates 中 true=通过 false=不通过(淘汰) 缺省=待核实(先决条件)。",
+  "gate_rules": [
+    {
+      "key": "iso9001",
+      "label": "ISO9001 认证在有效期内"
+    },
+    {
+      "key": "env_compliant",
+      "label": "近一年无重大环保/安全处罚"
+    },
+    {
+      "key": "rohs",
+      "label": "物料 RoHS 合规声明可提供"
+    }
+  ],
+  "weights": [
+    {
+      "key": "net_price",
+      "label": "归一化净单价(元)",
+      "weight": 0.3,
+      "direction": "lower"
+    },
+    {
+      "key": "pass_rate",
+      "label": "近6月批次合格率",
+      "weight": 0.3,
+      "direction": "higher"
+    },
+    {
+      "key": "otd",
+      "label": "近6月 OTD 准时交付率",
+      "weight": 0.25,
+      "direction": "higher"
+    },
+    {
+      "key": "payment_days",
+      "label": "账期(天)",
+      "weight": 0.15,
+      "direction": "higher"
+    }
+  ],
+  "candidates": [
+    {
+      "supplier": "甲供应商（示例）",
+      "gates": {
+        "iso9001": true,
+        "env_compliant": true,
+        "rohs": true
+      },
+      "metrics": {
+        "net_price": 13.27,
+        "pass_rate": 0.985,
+        "otd": 0.96,
+        "payment_days": 60
+      }
+    },
+    {
+      "supplier": "乙供应商（示例）",
+      "gates": {
+        "iso9001": true,
+        "env_compliant": true,
+        "rohs": true
+      },
+      "metrics": {
+        "net_price": 12.9,
+        "pass_rate": 0.94,
+        "otd": 0.88,
+        "payment_days": 30
+      }
+    },
+    {
+      "supplier": "丙供应商（示例）",
+      "gates": {
+        "iso9001": true,
+        "env_compliant": false,
+        "rohs": true
+      },
+      "metrics": {
+        "net_price": 14.6,
+        "pass_rate": 0.97,
+        "otd": 0.95,
+        "payment_days": 45
+      }
+    },
+    {
+      "supplier": "丁供应商（示例·待补证）",
+      "gates": {
+        "iso9001": true,
+        "env_compliant": true,
+        "rohs": null
+      },
+      "metrics": {
+        "net_price": 13.2,
+        "pass_rate": 0.96,
+        "payment_days": 50
+      }
+    }
+  ]
+}

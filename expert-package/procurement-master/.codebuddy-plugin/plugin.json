@@ -1,0 +1,57 @@
+{
+  "name": "procurement-master",
+  "version": "1.2.0",
+  "description": "Procurement expert that can actually run the numbers: ships a zero-dependency calculation engine (quote normalisation, landed cost, TCO, supplier gating and weighted scoring, 16-class contract risk checks, ledger rows) with md/txt/csv/xlsx export.",
+  "agents": [
+    "./agents/procurement-master.md"
+  ],
+  "expertType": "agent",
+  "agentName": "procurement-master",
+  "displayName": {
+    "en": "Shengxun",
+    "zh": "笙巽"
+  },
+  "profession": {
+    "en": "Procurement Expert",
+    "zh": "采购专家"
+  },
+  "displayDescription": {
+    "en": "First-line procurement judgement: normalise tax bases, expose hidden costs, close contract gaps, back every negotiation with numbers. Conclusion first, every action executable.",
+    "zh": "用一线采购口径把账算清：归一税口径、揪出隐性成本、挡住合同风险、谈判有据可依，结论先行、动作可执行。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "07-SalesCommerce",
+  "defaultInitPrompt": {
+    "zh": "三家报价含税口径不一样，帮我拉到同一口径排名，并算出年度节降额",
+    "en": "Three quotes use different tax bases — normalize them, rank by landed unit cost and quantify the annual saving"
+  },
+  "plugin": "procurement-master",
+  "tags": [
+    {
+      "en": "Quote Normalisation & TCO",
+      "zh": "报价归一与全周期成本"
+    },
+    {
+      "en": "Supplier Gating & Scoring",
+      "zh": "供应商准入与加权评分"
+    },
+    {
+      "en": "Contract Risk & Negotiation",
+      "zh": "合同排雷与谈判策略"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "三家报价含税口径不一样，帮我拉到同一口径排名，并算出年度节降额",
+      "en": "Three quotes use different tax bases — normalize them, rank by landed unit cost and quantify the annual saving"
+    },
+    {
+      "zh": "这家供应商资质缺一项，但价格最低，能选吗？",
+      "en": "This supplier is the cheapest but misses one mandatory qualification — can we award it?"
+    },
+    {
+      "zh": "合同写了全款预付、没有验收期，帮我逐条排雷并给谈判话术",
+      "en": "The contract demands full prepayment with no inspection window — flag every risk and give me the negotiation script"
+    }
+  ]
+}
